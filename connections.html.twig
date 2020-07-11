@@ -1,0 +1,543 @@
+<html>
+
+<head>
+    {% block stylesheets %}
+        {% stylesheets '@AppBundle/Resources/public/css/*' filter='uglifycss' filter='cssrewrite' %}
+            <link rel="stylesheet" href="{{ asset_url }}"/>
+            <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+        {% endstylesheets %}
+
+        <style>
+            .connections-block {
+                background-color: #E3E3E3;
+                box-shadow: 0 0 2px #838383;
+                padding: 15px;
+            }
+
+            .empty-connections {
+                text-align: center;
+                margin: 58px auto 15px;
+                font-size: 18px;
+                display: block;
+                font-family: 'Roboto Slab', sans-serif;
+            }
+
+            .connection-container {
+                cursor: pointer;
+                padding: 0 20px;
+                border-bottom: 1px solid #CCC;
+                background-color: #EAEAEA;
+            }
+
+            .connection-container:hover {
+                background-color: #EEE;
+            }
+
+            .connection-container:hover .connection-menu-icon {
+                visibility: visible;
+            }
+
+            .connection-container:nth-of-type(odd) {
+                background-color: #F0F0F0;
+            }
+
+            .connection-container:first-of-type {
+                border-radius: 5px 5px 0 0;
+            }
+
+            .connection-container:last-of-type {
+                border-radius: 0 0 5px 5px;
+            }
+
+            .connection-profile-image {
+                vertical-align: middle;
+                vertical-align: -webkit-baseline-middle;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                display: inline-block;
+            }
+
+            .connection-name {
+                margin-left: 15px;
+                font-family: 'Roboto Slab', sans-serif;
+                display: inline-block;
+                font-size: 20px;
+            }
+
+            .connection-title {
+                margin-left: 69px;
+                margin-top: -20px;
+                font-size: 17px;
+            }
+
+            .next-button, .previous-button {
+                background-color: transparent;
+                border: 2px solid #18a2d9;
+                padding: 6px 13px;
+                border-radius: 3px;
+                color: #111;
+                margin-top: 15px;
+            }
+
+            .next-button:hover, .previous-button:hover {
+                background-color: #18a2d9;
+                border: 2px solid #1894c5;
+                color: #FEFEFE;
+            }
+
+            .next-button {
+                float: right;
+            }
+
+            .previous-button {
+                float: left;
+            }
+
+            .connections-filters {
+                width: 315px;
+                background-color: #D3D3D3;
+                border-radius: 5px;
+            }
+
+            .connection-filter {
+                padding: 15px 0;
+                cursor: pointer;
+            }
+
+            .connection-filter:hover, .filter-on:hover {
+                background-color: #ADADAD !important;
+            }
+
+            .connection-filter:first-of-type {
+                border-radius: 5px 0 0 5px;
+            }
+
+            .connection-filter:last-of-type {
+                border-radius: 0 5px 5px 0;
+            }
+
+            .filter-on {
+                background-color: #919191;
+            }
+
+            .filter-on:nth-of-type(even) {
+                background-color: #989898;
+            }
+
+            .connection-filter img {
+                display: block;
+                margin: 0 auto;
+            }
+
+            .search-container {
+                position: relative;
+                width: 315px;
+            }
+
+            .connections-search {
+                font-family: 'Roboto Slab', sans-serif;
+                font-size: 16px;
+                margin: 15px 0;
+                padding: 10px 35px 10px 15px;
+                background-color: #f6f6f6;
+                border: 1px solid #CCC;
+                width: 263px !important;
+                min-width: 0 !important;
+            }
+
+            .search-icon {
+                position: absolute;
+                right: 5px;
+                top: 20px;
+                width: 30px;
+                height: 30px;
+                margin-left: 30px;
+            }
+
+            .connection-menu {
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
+
+            .connection-menu ul {
+                position: absolute;
+                left: -20px;
+                color: white;
+                top: 25px;
+                background-color: #434343;
+                font-family: 'Roboto Slab', sans-serif;
+                font-size: 13px;
+                z-index: 1;
+                list-style: none;
+                padding: 0;
+                width: 135px;
+            }
+
+            .connection-menu ul li {
+                display: block;
+                margin: 0;
+                padding: 10px 5px;
+            }
+
+            .connection-menu ul li:hover {
+                background-color: #5e5e5e;
+                color: #fdb11f;
+            }
+
+            .connection-menu ul li:last-of-type {
+                border: none;
+            }
+
+            .connection-menu-icon {
+                visibility: hidden;
+                position: absolute;
+                right: -2px;
+                top: 4px;
+                width: 18px;
+                height: 18px;
+                padding: 8px;
+            }
+
+            .connections-count {
+                margin: 23px auto -37px;
+                text-align: center;
+                color: #505050;
+                font-family: 'Roboto Slab', sans-serif;
+                font-size: 12px;
+            }
+
+            .group:hover {
+                background-color: #CCC;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            .group-image {
+                width: 65px;
+                height: 65px;
+                border-radius: 50%;
+                display: block;
+                margin: 20px auto 0;
+            }
+
+            .group-name {
+                font-size: 1em;
+                text-align: center;
+                margin-top: 10px;
+            }
+        </style>
+    {% endblock %}
+</head>
+
+{% block body %}
+    <body>
+
+    {{ include('@App/Templates/mainHeader.html.twig') }}
+    {{ knp_menu_render('AppBundle:Builder:mainMenu') }}
+
+    <article id="app">
+        <div @click="closeGroupsModal()" v-cloak v-if="showGroupsModal" class="dark-backdrop"></div>
+        <div v-cloak v-if="showGroupsModal" class="ping-modal-container">
+            <div class="ping-modal">
+                <img v-cloak v-if="groupsModal.loading"
+                     src="{{ absolute_url(asset('bundles/app/img/icons/ping-logo-animation.gif')) }}"
+                     class="ping-loading-icon"/>
+                <div v-cloak v-if="!groupsModal.loading">
+                    <h3 class="heading" style="text-align:center;"></h3>
+                    <div class="row">
+                        <div @click="inviteConnection(group.uuid)" v-if="groups.length > 0" v-for="group in groups"
+                             class="col-sm-3 group">
+                            <img :src="group.profileImage" class="group-image"/>
+                            <h4 v-text="group.name"
+                                class="main-heading dark-text group-name"></h4>
+                        </div>
+                    </div>
+                    <div class="col-sm-8" style="margin-left:15px;">
+                        <button v-cloak v-if="!groupsModal.loading" @click="closeGroupsModal()"
+                                class="small-button neutral-button">Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row light-row">
+            <div class="col-sm-4 offset-2">
+                <div class="wider-input">
+                    <div class="search-container">
+                        <input v-model="filterBy.search" type="text" class="connections-search">
+                        <img src="https://cdn1.iconfinder.com/data/icons/hawcons/32/698627-icon-111-search-512.png"
+                             class="search-icon">
+                    </div>
+
+                    <div class="row connections-filters">
+                        <div @click="filterBy.favorites = !filterBy.favorites" class="connection-filter col-sm-3"
+                             :class="{ 'filter-on': filterBy.favorites } " title="Filter by Favorites">
+                            <img src="https://cdn2.iconfinder.com/data/icons/crystalproject/crystal_project_256x256/apps/keditbookmarks.png"
+                                 style="width:20px; height:20px;"/>
+                        </div>
+                        <div @click="filterBy.company = !filterBy.company" class="connection-filter col-sm-3"
+                             :class="{ 'filter-on': filterBy.company } " title="Filter by Company">
+                            <img src="https://www.shareicon.net/download/2016/08/24/820078_business_512x512.png"
+                                 style="width:20px; height:20px;"/>
+                        </div>
+                        <div @click="filterBy.alphabetical = !filterBy.alphabetical" class="connection-filter col-sm-3"
+                             :class="{ 'filter-on': filterBy.alphabetical } " title="Sort Alphabetically">
+                            <img src="https://cdn3.iconfinder.com/data/icons/text-icons-1/512/BT_sort_az-512.png"
+                                 style="width:20px; height:20px;"/>
+                        </div>
+                        <div @click="filterBy.filter = !filterBy.filter" class="connection-filter col-sm-3"
+                             :class="{ 'filter-on': filterBy.filter } " title="Filter by Favorites">
+                            <img src="https://www.shareicon.net/download/2016/08/24/820078_business_512x512.png"
+                                 style="width:20px; height:20px;"/>
+                        </div>
+                    </div>
+
+                    <button @click="loadConnections(true)" class="connect-button" style="margin-top:15px;">Search
+                    </button>
+                </div>
+            </div>
+            <div v-cloak v-if="connections != null" class="col-sm-4 connections-block">
+                <p v-cloak v-if="connections.length === 0" class="big center-align dark-text empty-connections">
+                    No connections to show.
+                </p>
+                <div @click="goToProfile(connection.uuid)" v-for="connection in connections"
+                     class="connection-container relative">
+                    <div class="connection-menu">
+                        <img @click.stop="hideConnectionMenus(connection.uuid);"
+                             src="{{ absolute_url(asset('bundles/app/img/icons/dot-menu.png')) }}"
+                             class="connection-menu-icon"/>
+                        <ul v-cloak v-if="connection.showMenu" @mouseover="connection.showMenu = true"
+                            @mouseout="hideConnectionMenus()">
+                            <li @click.stop="goToProfile(connection.uuid)" class="center-align">View Profile</li>
+                            <li v-cloak v-if="!connection.favorited" @click.stop="addFavorite(connection.uuid)"
+                                class="center-align">Add Favorite
+                            </li>
+                            <li v-cloak v-else @click.stop="removeFavorite(connection.uuid)" class="center-align">Remove
+                                Favorite
+                            </li>
+                            <li @click.stop="loadUserGroups(connection.uuid)" class="center-align">Invite To</li>
+                            <li @click.stop="disconnectFromUser(connection.uuid)" class="center-align">Disconnect</li>
+                        </ul>
+                    </div>
+                    <img class="connection-profile-image" :src="connection.profileImage"/>
+                    <p v-text="connection.firstName + ' ' + connection.lastName"
+                       class="big dark-text connection-name"></p>
+                    <p v-cloak v-if="connectionsOnly" class="big dark-text connection-title">
+                        <i v-text="connection.jobTitle + ', ' + connection.company"></i>
+                    </p>
+                    <p v-cloak v-else class="big dark-text connection-title">
+                        <i v-text="connection.jobTitle + ', ' + connection.companyName"></i>
+                    </p>
+                </div>
+                <div style="margin:0 auto; display:block; width:40%; position:relative;">
+                    <p v-cloak v-if="pagination.totalPages > 1"
+                       v-text="'Showing ' + (pagination.size * (pagination.page - 1) + 1) + ' - ' + (pagination.size * (pagination.page - 1) + connections.length) + ' of ' + pagination.totalConnections + ' Results'"
+                       class="connections-count"></p>
+                    <p v-cloak v-else
+                       v-text="'Showing ' + connections.length + ' of ' + pagination.totalConnections + ' Results'"
+                       class="connections-count" style="margin: 17px auto 0;"></p>
+                </div>
+                <button v-cloak v-if="pagination.page > 1" @click.prevent="previousPage()" class="previous-button">
+                    Back
+                </button>
+                <button v-cloak v-if="pagination.page < pagination.totalPages" @click.prevent="nextPage()"
+                        class="next-button">Next
+                </button>
+                <div class="clear" style="margin:0; overflow:auto;"></div>
+            </div>
+
+        </div>
+    </article>
+
+    <footer class="main-footer"></footer>
+
+    {% block javascripts %}
+        {% javascripts '@AppBundle/Resources/public/js/*' filter='uglifyjs2' %}
+        <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+
+        {% javascripts '@FOSJsRoutingBundle/Resources/public/js/router.js' filter='uglifyjs2' %}
+        <script src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+        <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+
+        <script>
+            const app = new Vue({
+                el: "#app",
+                mounted: function () {
+                    this.loadConnections();
+                },
+                data: function () {
+                    return {
+                        connections: null,
+                        connectionsOnly: false,
+                        groups: [],
+                        showGroupsModal: false,
+                        groupsModal: {
+                            loading: false,
+                            groupsLoaded: false,
+                            invitingUser: null,
+                        },
+                        filterBy: {
+                            search: null,
+                            favorites: false,
+                            company: false,
+                            alphabetical: false,
+                            filter: false,
+                        },
+                        pagination: {
+                            page: 1,
+                            totalConnections: null,
+                            totalPages: null,
+                            size: 5,
+                        }
+                    };
+                },
+                methods: {
+                    loadConnections: function (forced = null) {
+                        let route = app.connectionsOnly ? 'load_connections' : 'load_users';
+                        axios.post(route, {
+                            filterBy: this.filterBy,
+                            pagination: this.pagination,
+                        }).then(function (response) {
+                            if (!app.connectionsOnly) {
+                                Vue.set(app, "connections", response.data.users);
+                                Vue.set(app.pagination, "totalConnections", response.data.totalUsers);
+                                Vue.set(app.pagination, "totalPages", response.data.totalPages);
+                                Vue.nextTick(function () {
+                                    app.connections.forEach(function (user, index) {
+                                        Vue.set(app.connections[index], "showMenu", false);
+                                    });
+                                });
+                            } else {
+                                Vue.set(app, "connections", response.data.connections);
+                                Vue.set(app.pagination, "totalConnections", response.data.totalConnections);
+                                Vue.set(app.pagination, "totalPages", response.data.totalPages);
+                                Vue.nextTick(function () {
+                                    app.connections.forEach(function (conn, index) {
+                                        Vue.set(app.connections[index], "showMenu", false);
+                                    });
+                                });
+                            }
+
+                        }).catch(function () {
+                            alert('failure!');
+                        }).then(function () {
+                            if (forced) {
+                                Vue.set(app.pagination, "page", 1);
+                            }
+                        });
+                    },
+                    getConnectionByUuid: function (uuid) {
+                        let user = null;
+                        app.connections.forEach(function (conn, index) {
+                            if (conn.uuid === uuid) {
+                                user = index;
+                            }
+                        });
+
+                        return user;
+                    },
+                    addFavorite: function (uuid) {
+                        app.hideConnectionMenus();
+
+                        axios.post(Routing.generate('add_favorite_user', {userId: uuid})
+                        ).then(function (response) {
+                            let user = app.getConnectionByUuid(uuid);
+                            Vue.set(app.connections[user], "favorited", true);
+                        }).catch(function () {
+                            alert('failure!');
+                        });
+                    },
+                    removeFavorite: function (uuid) {
+                        app.hideConnectionMenus();
+
+                        axios.post(Routing.generate('remove_favorite_user', {userId: uuid})
+                        ).then(function (response) {
+                            let user = app.getConnectionByUuid(uuid);
+                            Vue.set(app.connections[user], "favorited", false);
+
+                            if (app.filterBy.favorites) {
+                                app.loadConnections();
+                            }
+                        }).catch(function () {
+                            alert('failure!');
+                        });
+                    },
+                    loadUserGroups: function (invitingUser) {
+                        Vue.set(app.groupsModal, "loading", true);
+                        Vue.set(this, "showGroupsModal", true);
+                        Vue.set(this.groupsModal, "invitingUser", invitingUser);
+                        axios.post('load_user_groups', []).then(function (response) {
+                            Vue.set(app, "groups", JSON.parse(response.data.groups));
+                            Vue.set(app.groupsModal, "loading", false);
+                        }).catch(function () {
+                            Vue.set(app.groupsModal, "loading", false);
+                            alert('failed');
+                        });
+                    },
+                    inviteConnection: function (groupId) {
+                        setTimeout(app.closeGroupsModal(), 1200);
+                        axios.post(Routing.generate('invite_to_group', {
+                            userId: app.groupsModal.invitingUser,
+                            groupId: groupId,
+                        })).then(function (response) {
+                            Vue.set(app.groupsModal, "invitingUser", null);
+                            if (response.data.invited) {
+                                notify("Invitation Sent.");
+                            } else {
+                                notify("User Already Invited.");
+                            }
+                        }).catch(function () {
+                            Vue.set(app.groupsModal, "invitingUser", null);
+                            notify("Invitation Not Sent.");
+                        });
+                    },
+                    disconnectFromUser: function (uuid) {
+                        app.hideConnectionMenus();
+                        axios.post(Routing.generate('user_disconnect', {requestedId: uuid}), {}
+                        ).then(function () {
+                            app.loadConnections();
+                        }).catch(function () {
+                        });
+                    },
+                    hideConnectionMenus: function (except = null) {
+                        app.connections.forEach(function (conn) {
+                            if (except && conn.uuid === except) {
+                                Vue.set(conn, "showMenu", !conn.showMenu);
+                            } else {
+                                Vue.set(conn, "showMenu", false);
+                            }
+                        });
+                    },
+                    openGroupsModal: function (userId) {
+                        Vue.set(this, "showGroupsModal", true);
+                        this.loadUserGroups();
+                    },
+                    closeGroupsModal: function () {
+                        Vue.set(this, "showGroupsModal", false);
+                        Vue.set(this.groupsModal, "loadedGroups", false);
+                    },
+                    goToProfile: function (uuid) {
+                        app.hideConnectionMenus();
+                        document.location.href = Routing.generate('user_profile', {userId: uuid});
+                    },
+                    nextPage: function () {
+                        app.loadConnections();
+                        Vue.set(app.pagination, "page", app.pagination.page + 1);
+                    },
+                    previousPage: function () {
+                        app.loadConnections();
+                        Vue.set(app.pagination, "page", app.pagination.page - 1);
+                    },
+                },
+                watch: {}
+            });
+        </script>
+    {% endblock %}
+    </body>
+{% endblock %}
+
+</html>
