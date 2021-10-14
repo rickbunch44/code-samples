@@ -7,8 +7,8 @@ echo "<br /><br />";
 $shopify->getCustomers(2);
 
 class ShopifyRequest {
-    const API_KEY = '2f674fa273473d4e7f96aa828443dcbd';
-    const API_PRIVATE = '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';
+    const API_KEY = 'XXX';
+    const API_PRIVATE = 'XXX';
     const BASE_URL = 'ricks-jewelry-shop.myshopify.com';
 
     public function getCustomers($limit) {
