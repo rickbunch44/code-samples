@@ -58,15 +58,6 @@ const router = createRouter({
             },
             props: true,
         },
-        // {
-        //     path: '/',
-        //     name: 'landing_two',
-        //     component: Landing_2,
-        //     meta: {
-        //         title: "WALRUS COMMERCE - Tarot Decks, Oracle Cards, Divination Tools, and more",
-        //     },
-        //     props: true,
-        // },
         {
             path: '/welcome',
             name: 'construction',
